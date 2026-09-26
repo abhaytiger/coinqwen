@@ -111,3 +111,67 @@ pink hammock), `surfboard.png`, `tiki_torch.png`, `flamingo_float.png`, `cooler_
 
 Regenerate everything: `python _tools/gen_ground.py _tools/gen_blob.py` etc. — each
 script is standalone; tweak the palette dicts at the top for instant re-themes.
+
+---
+# v2 PREMIUM UPGRADE (Sep 26, 2026) — sprite sheets for everything that moves,
+# richer characters/enemies, MEGA ground, rivers/water, one golden coin per stage.
+
+## 1. Animated sprite sheets (every moving thing is a sheet now)
+- **Heroes** `characters/hero_<skin>.png` — 4x2 @48x56: row0 idle0/idle1/jump/collect,
+  row1 run0-3. Rebuilt with hood shading, drawstrings, backpack straps + coin pouch,
+  laced soled boots, fingered gloves, big sparkly eyes w/ blush, soft ground shadow,
+  antialiased silhouettes. Skins: default, snow (scarf), beach (sunglasses).
+- **Animal heroes** `characters/hero_{penguin,crab,bunny,fox,cat,owl}.png` — same 4x2
+  layout @48x56, fully redrawn: layered feather/fur dithering, wing-flap on jump,
+  tail-wag/ear-tilt per run frame, claw-raise, blink frames, speculars.
+- **Enemies** `enemies/jelly_{green,ice,ember}.png` — 6x2 @40x40 glossy blobs:
+  row0 = idle(4 breath frames)+jump(crouch-stretch, air-squint), row1 = land-slam,
+  recover, move/waddle(4). Inner glow core, sliding specular highlight, drips, sprout/
+  icicles/flame-wisp decorations per world.
+- Review contact sheets: `characters/CONTACT_heroes_v2.png`, `enemies/CONTACT_enemies_v2.png`,
+  `ground/CONTACT_ground_v2.png`, `coins/CONTACT_gold_v2.png`.
+
+## 2. GROUND — the star of the screen (`ground/`)
+- `mega_grass.png` / `mega_snow.png` / `mega_sand.png` — 8x4 @16 tiles:
+  row0 surface variants (grass blades+seam dither / snow crust+sparkles / sand ripples),
+  row1 dirt·frost·wet-sand fills with strata bands, pebbles, roots & blend-top versions,
+  row2 terrain corners TL/TR/BL/BR, row3 side edges + extras. Use as a Godot Terrain Set.
+- `cliff_grass.png` — 3x2 grass-lip rock cliff faces (top/sideL/sideR) x2 variants.
+- Depth shading: every tile has bottom-edge darkening so stacked ground reads 3D.
+
+## 3. WATER — rivers & seas (`ground/`)
+- `water_river.png` — 4x4 @16, four 4-frame cycles: row0 RIVER flow (scroll left→right
+  at ~48px/s), row1 LAKE surface bob, row2 SHALLOW edge foam (place over sand/dirt),
+  row3 WATERFALL streaks. Meadow river = river row + shallow edge + `pond_tiles.png`
+  shoreline rings in `worlds/classic_meadow/`.
+- `water_deep.png` — 2x4 @16 deep-ocean drift tiles for the BEACH water zone; pair with
+  the new wave-crest `bg_mid.png` and buoy/bob props.
+
+## 4. ONE GOLDEN ROTATING COIN PER STAGE (`coins/`) — hero collectibles
+- `gold_classic.png` (meadow, star emboss), `gold_snow.png` (crystal emboss),
+  `gold_beach.png` (sun emboss) — each an 8-frame @32px true 3D spin: face-on → edge-on,
+  travelling specular glint, rim ring, emboss fades out on turn, sparkle cross at face-on.
+- `gold_mega.png` — 10-frame @48 milestone version (end-of-stage drop).
+Place exactly one gold per stage as the "shiny" pickup; regular coins stay as-is.
+
+## 5. MORE ELEMENTS PER STAGE
+- **Meadow**: `windmill.png` (4-frame rotating sails), `flower_bed.png`, `bench.png`,
+  `scarecrow.png`, `river_reed.png`, `lamp_post.png`, `signpost_mile.png`, `pond_tiles.png`.
+- **Snow**: `igloo_big.png`, `snow_fort.png`, `cabin_v2.png` (log wall seams, wreath,
+  glowing window, drifts), `ice_turret.png`, `spruce_v2.png` (snow-capped tiers),
+  `mittens_sign.png`, `chimney_smoke.png` (3-frame rising puffs — overlay on cabins).
+- **Beach**: `palm_v2.png` (curved trunk, coconuts, leaflet fronds), `boat.png`,
+  `rock_arch.png` (sea-glimpse arch), `tidepool.png` (starfish+anemone), `bonfire.png`,
+  `beachflag.png`, `pier_lamp.png`, `bucket_set.png`.
+
+## 6. BACKGROUNDS v3 (`worlds/<stage>/bg_far|bg_mid.png` @480x270)
+- Meadow: gradient sky, two cloud bands, halo sun, layered hills + ridge treeline,
+  floating islands w/ dangling vines in bg_mid.
+- Snow: night gradient, twinkling stars, moon+glow, 3 aurora ribbons, jagged ice peaks,
+  snowy spruce parallax line.
+- Beach: sunset gradient, giant low sun w/ banded clouds, ocean band w/ shimmer +
+  sun-glitter path, sailboats, palm silhouettes; bg_mid = animated-ready wave crest + foam.
+
+Regenerate: `python _tools/gen_heroes.py gen_hero_animals.py gen_blobs2.py
+gen_ground_mega.py gen_gold_coins.py gen_stage_v3.py gen_bg_v3.py` then
+`python _tools/compose_contact.py && python _tools/make_manifest.py`.
