@@ -341,6 +341,210 @@ def owl(ph=0):
     return img
 
 
+# ====================================================== BACK VIEWS (walk away)
+def penguin_back(ph=0):
+    ph = int(round(float(ph)))
+    img = N()
+    body = (44, 52, 74, 255); body_d = (26, 32, 50, 255)
+    beak = (248, 176, 64, 255); feet = (240, 156, 52, 255)
+    lift = ph
+    rect(img, 15 - abs(lift), 47, 22 - abs(lift), 49, feet)
+    rect(img, 15 - abs(lift), 49, 23 - abs(lift), 50, darker(feet, 40))
+    rect(img, 27 + (lift or 0), 47, 34 + (lift or 0), 49, feet)
+    rect(img, 27 + (lift or 0), 49, 35 + (lift or 0), 50, darker(feet, 40))
+    # tail feathers over the rear
+    line(img, [(22, 42), (24, 47), (26, 42)], body_d, 3)
+    px(img, 24, 46, lighter(body, 20))
+    # round back
+    rrect(img, 14, 20, 34, 47, body, radius=4)
+    ellipse(img, 14, 26, 34, 47, body)
+    bottom_shade(img, 14, 26, 34, 47, None, 30)
+    top_light(img, 15, 20, 33, 26, None, 14)
+    noise(img, 16, 24, 32, 44, [darker(body, 18)], 0.10, seed=4)      # feather texture
+    # head from behind: dark dome + nape fluff, beak tip peeking left
+    ellipse(img, 15, 6, 35, 26, body)
+    rect(img, 15, 16, 35, 24, body)
+    top_light(img, 17, 6, 33, 11, None, 18)
+    px(img, 13, 15, beak); px(img, 13, 16, darker(beak, 40))          # hidden beak edge
+    # wings at sides (flap with ph)
+    flap = 0 if ph in (0, 1) else (2 if ph == 2 else -1)
+    ellipse(img, 10, 24 - flap, 16, 40 - flap, body_d)
+    ellipse(img, 32, 24 + flap, 38, 40 + flap, body_d)
+    top_light(img, 10, 24 - flap, 16, 27 - flap, None, 16)
+    return img
+
+
+def crab_back(ph=0):
+    ph = int(round(float(ph)))
+    img = N()
+    shell = (232, 84, 72, 255); shell_d = (176, 48, 52, 255); shell_l = (255, 140, 110, 255)
+    leg = (214, 66, 64, 255)
+    step = ph % 2
+    for i, lx in enumerate((14, 20, 26)):                              # scuttling legs
+        off = (i + step) % 2
+        line(img, [(lx, 38), (lx - 4 + off, 44), (lx - 5 + off, 49)], leg, 2)
+        line(img, [(lx + 14, 38), (lx + 18 - off, 44), (lx + 19 - off, 49)], leg, 2)
+    raise_ = -abs(ph) if ph < 0 else 0
+    cy = 30 + raise_
+    line(img, [(15, 38), (11, cy + 4)], leg, 3)                        # claws (mostly hidden)
+    ellipse(img, 7, cy, 13, cy + 7, (214, 66, 64, 255))
+    line(img, [(35, 38), (39, cy + 4)], leg, 3)
+    ellipse(img, 37, cy, 43, cy + 7, (214, 66, 64, 255))
+    # full carapace seen from above/behind
+    ellipse(img, 10, 20, 40, 42, shell)
+    rect(img, 10, 30, 40, 40, shell)
+    bottom_shade(img, 10, 24, 40, 41, None, 42)
+    top_light(img, 12, 20, 38, 26, None, 36)
+    noise(img, 14, 24, 36, 36, [shell_d, shell_l], 0.18, seed=12)
+    rect(img, 23, 22, 25, 40, shell_d)                                 # center seam
+    for sx, sy in ((18, 28), (30, 26), (24, 33), (17, 35), (32, 34)):  # bumps
+        px(img, sx, sy, shell_d); px(img, sx + 1, sy, shell_d)
+        px(img, sx, sy - 1, shell_l)
+    rect(img, 11, 39, 39, 40, shell_d)
+    return img
+
+
+def bunny_back(ph=0):
+    ph = int(round(float(ph)))
+    img = N()
+    fur = (238, 226, 232, 255); fur_d = (198, 180, 196, 255)
+    suit = (120, 190, 140, 255); suit_d = (78, 148, 100, 255)
+    kick = ph
+    rect(img, 12 - max(0, -kick), 46, 22, 49, fur)                     # big feet
+    rect(img, 12 - max(0, -kick), 49, 22, 50, fur_d)
+    rect(img, 26 + max(0, kick), 46, 36, 49, fur)
+    rect(img, 26 + max(0, kick), 49, 36, 50, fur_d)
+    rrect(img, 15, 26, 34, 46, suit, radius=3)                         # overall back
+    bottom_shade(img, 15, 26, 34, 46, None, 36)
+    rect(img, 15, 42, 34, 42, suit_d)
+    rect(img, 20, 30, 29, 37, suit_d)                                   # patch pocket
+    rect(img, 20, 30, 29, 30, darker(suit_d, 20)); rect(img, 20, 30, 20, 37, darker(suit_d, 20))
+    px(img, 24, 33, (250, 230, 120, 255))                              # carrot stitch
+    px(img, 25, 34, (240, 150, 80, 255)); px(img, 25, 32, (110, 190, 110, 255))
+    ellipse(img, 12, 28 - kick, 17, 36 - kick, fur)                    # arms
+    ellipse(img, 33, 28 + kick, 38, 36 + kick, fur)
+    ellipse(img, 14, 10, 36, 30, fur)                                  # head back
+    rect(img, 14, 20, 36, 28, fur)
+    top_light(img, 16, 10, 34, 16, None, 14)
+    bottom_shade(img, 14, 20, 36, 29, None, 22)
+    tilt = ph % 2                                                       # ears from behind
+    e1x = 18 - tilt
+    line(img, [(e1x + 2, 12), (e1x, 0)], fur, 5)
+    line(img, [(e1x + 2, 11), (e1x + 1, 2)], fur_d, 2)
+    e2x = 26 + tilt
+    line(img, [(e2x, 12), (e2x + 3, 1)], fur, 5)
+    line(img, [(e2x + 1, 11), (e2x + 3, 3)], fur_d, 2)
+    # fluffy cotton tail wiggles
+    tx = 24 + (ph % 3 - 1)
+    ellipse(img, tx - 3, 36, tx + 3, 42, (255, 255, 255, 255))
+    noise(img, tx - 3, 36, tx + 3, 42, [fur_d], 0.18, seed=2)
+    top_light(img, tx - 2, 36, tx + 2, 38, None, 10)
+    return img
+
+
+def fox_back(ph=0):
+    ph = int(round(float(ph)))
+    img = N()
+    fur = (236, 128, 56, 255); fur_d = (186, 82, 34, 255); cream = (252, 236, 214, 255)
+    dark = (60, 44, 52, 255)
+    trot = ph
+    wag = (trot % 3) - 1                                                # tail sweeps side to side
+    pts = [(24, 40), (28 + wag * 3, 36), (32 + wag * 5, 30), (34 + wag * 6, 24)]
+    line(img, pts, fur, 7)
+    line(img, pts[1:], fur, 6)
+    ellipse(img, 32 + wag * 6, 20, 40 + wag * 6, 28, cream)             # white tip
+    px(img, 36 + wag * 6, 22, lighter(cream, 10))
+    for lx, off in ((16, -trot), (22, trot), (28, trot), (33, -trot)):  # dark-stockinged legs
+        rect(img, lx, 42, lx + 3, 48 + (off % 2), dark)
+        rect(img, lx, 48 + (off % 2), lx + 4, 49 + (off % 2), darker(dark, 25))
+    rrect(img, 13, 28, 36, 44, fur, radius=3)                           # back coat
+    bottom_shade(img, 13, 28, 36, 44, None, 34)
+    top_light(img, 14, 28, 34, 31, None, 26)
+    rect(img, 23, 29, 25, 43, fur_d)                                    # dorsal stripe
+    ellipse(img, 11, 30 - trot, 16, 38 - trot, fur_d)                   # arms
+    ellipse(img, 33, 30 + trot, 38, 38 + trot, fur_d)
+    ellipse(img, 12, 10, 36, 30, fur)                                   # head back
+    rect(img, 12, 20, 36, 28, fur)
+    d = ImageDraw.Draw(img)                                             # ear backs
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(14, 14), (18, 2), (22, 14)]], fill=fur)
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(16, 12), (18, 5), (20, 12)]], fill=(40, 30, 40, 255))
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(27, 14), (31, 2), (35, 14)]], fill=fur)
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(29, 12), (31, 5), (33, 12)]], fill=(40, 30, 40, 255))
+    rrect(img, 12, 24, 22, 29, cream, radius=2)                          # cheek fluff rims
+    rrect(img, 27, 24, 36, 29, cream, radius=2)
+    px(img, 24, 28, dark)                                               # nose tip peeking down
+    return img
+
+
+def cat_back(ph=0):
+    ph = int(round(float(ph)))
+    img = N()
+    fur = (128, 138, 190, 255); fur_d = (88, 96, 148, 255); cream = (246, 238, 226, 255)
+    pink = (240, 160, 176, 255)
+    swish = ph % 3 - 1
+    pts = [(34, 40), (40, 38), (43, 32), (41, 26), (36, 24 + swish * 2)]  # curling tail
+    line(img, pts, fur, 4)
+    for sx, sy in ((40, 36), (42, 30)):
+        px(img, sx, sy, fur_d)
+    px(img, 36, 23 + swish * 2, cream); px(img, 37, 23 + swish * 2, cream)
+    for lx, off in ((15, -max(0, swish)), (21, max(0, swish)), (28, -max(0, swish)), (33, max(0, swish))):
+        ellipse(img, lx, 44 + off, lx + 5, 48 + off, cream)
+        px(img, lx + 1, 47 + off, fur_d)
+    rrect(img, 13, 28, 36, 46, fur, radius=4)                           # rounded back
+    bottom_shade(img, 13, 28, 36, 46, None, 32)
+    for sx in (18, 23, 28, 32):                                         # tabby stripes across
+        rect(img, sx, 28, sx + 1, 33, fur_d)
+        rect(img, sx, 36, sx + 1, 39, fur_d)
+    ellipse(img, 11, 30, 16, 38, fur)
+    ellipse(img, 33, 30, 38, 38, fur)
+    ellipse(img, 13, 10, 37, 30, fur)                                   # head back
+    rect(img, 13, 20, 37, 28, fur)
+    d = ImageDraw.Draw(img)
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(15, 14), (18, 3), (24, 12)]], fill=fur)
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(17, 12), (18, 6), (22, 11)]], fill=pink)
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(27, 12), (33, 3), (36, 14)]], fill=fur)
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(29, 11), (33, 6), (34, 12)]], fill=pink)
+    rect(img, 23, 26, 27, 28, fur_d)                                    # little collar
+    px(img, 24, 27, (250, 220, 110, 255))                               # bell
+    return img
+
+
+def owl_back(ph=0):
+    ph = int(round(float(ph)))
+    img = N()
+    feather = (150, 108, 72, 255); f_d = (108, 74, 50, 255); f_l = (196, 156, 110, 255)
+    foot = (232, 158, 62, 255)
+    flap = -abs(ph) if ph < 0 else 0
+    d = ImageDraw.Draw(img)
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(14, 12), (16, 2), (22, 10)]], fill=f_d)
+    d.polygon([(x * SCALE, y * SCALE) for x, y in [(28, 10), (34, 2), (36, 12)]], fill=f_d)
+    for fx in (17, 27):                                                 # talons
+        for k in range(3):
+            line(img, [(fx + k * 2, 44), (fx + k * 2 - 1 + ph % 2, 49)], foot, 2)
+    ellipse(img, 12, 14, 38, 46, feather)                               # back of body
+    rect(img, 12, 24, 38, 42, feather)
+    bottom_shade(img, 12, 20, 38, 46, None, 30)
+    rnd = random.Random(9)                                              # layered back feathers
+    for yy in range(18, 44, 4):
+        for xx in range(14, 36, 4):
+            ox = ((yy // 4) % 2) * 2
+            arc = [(xx + ox, yy), (xx + ox + 2, yy + 2), (xx + ox + 4, yy)]
+            line(img, arc, f_d if rnd.random() > 0.5 else f_l, 1)
+    wy = 22 + flap                                                      # folded-then-spread wings
+    ellipse(img, 5, wy, 14, 42, f_d)
+    ellipse(img, 36, wy, 45, 42, f_d)
+    for i in range(4):
+        rect(img, 6, wy + 6 + i * 4, 13, wy + 6 + i * 4, feather)
+        rect(img, 37, wy + 6 + i * 4, 44, wy + 6 + i * 4, feather)
+    top_light(img, 14, 14, 36, 18, None, 16)
+    ellipse(img, 16, 6, 34, 20, feather)                                # head back (no discs)
+    rect(img, 16, 12, 34, 18, feather)
+    return img
+
+
+BACK_BUILDERS = {"penguin": penguin_back, "crab": crab_back, "bunny": bunny_back,
+                 "fox": fox_back, "cat": cat_back, "owl": owl_back}
+
 BUILDERS = {"penguin": penguin, "crab": crab, "bunny": bunny, "fox": fox, "cat": cat, "owl": owl}
 
 # frame params: idle small bob, run big phase, jump negative(flap/tuck), collect wave
@@ -361,15 +565,21 @@ FRAMES = {
 ORDER = ["idle0", "idle1", "jump", "collect", "run0", "run1", "run2", "run3"]
 
 for name, fn in BUILDERS.items():
-    sheet = Sheet(4, W, H, rows=2)
-    prev = []
+    bfn = BACK_BUILDERS[name]
+    sheet = Sheet(4, W, H, rows=4)
+    prev, prevb = [], []
     for i, prm in enumerate(FRAMES[name]):
         fr = finalize(fn(**prm), (36, 26, 44, 255))
         fr = shadow(fr.resize((W * SCALE, H * SCALE)))
-        fr = finalize_shadowed = fr
         sheet.add(fr)
         prev.append(fr)
-    sheet.save(os.path.join(OUT, f"hero_{name}.png"))
+    for i, prm in enumerate(FRAMES[name]):               # row2-3: back view
+        fr = finalize(bfn(**prm), (36, 26, 44, 255))
+        fr = shadow(fr.resize((W * SCALE, H * SCALE)))
+        sheet.add(fr)
+        prevb.append(fr)
+    sheet.canvas.save(os.path.join(OUT, f"hero_{name}.png"))
     save_scaled(hframes(prev[:4]), os.path.join(PREV, f"hero_{name}_idle_jump_collect@3x.png"), 3)
     save_scaled(hframes(prev[4:]), os.path.join(PREV, f"hero_{name}_run@3x.png"), 3)
+    save_scaled(hframes(prevb[4:]), os.path.join(PREV, f"hero_{name}_back_run@3x.png"), 3)
 print("animal heroes ok:", ", ".join(BUILDERS))

@@ -175,3 +175,43 @@ Place exactly one gold per stage as the "shiny" pickup; regular coins stay as-is
 Regenerate: `python _tools/gen_heroes.py gen_hero_animals.py gen_blobs2.py
 gen_ground_mega.py gen_gold_coins.py gen_stage_v3.py gen_bg_v3.py` then
 `python _tools/compose_contact.py && python _tools/make_manifest.py`.
+
+---
+
+## v5 FINAL PASS — 4-direction coverage, back-jump anims, sprint dust, water foam
+
+### hero_<skin>_4dir.png (8 cols x 4 rows of 48x56) — full up/down/left/right set
+| row | content | use for |
+|-----|---------|---------|
+| 0 | SIDE idle0 idle1 **jump** collect run0-run3 (faces LEFT) | move left + jump |
+| 1 | BACK idle0 idle1 **jump (NEW)** collect run0-run3 | move down (away from cam) |
+| 2 | row1 mirrored | move down-right while facing right |
+| 3 | row0 mirrored (faces RIGHT) | move right |
+- **Move UP**: reuse row1/row2 frames with `sprite.flip_v = true` (standard trick
+  for this side+top-down hybrid projection; the back view reads as a front-ish
+  top-down silhouette). Flip H/V in GDScript: `flip_h` for left/right, `flip_v`
+  for up when using the back set.
+- Standalone `hero_<skin>_back.png` (4x2 @48x56) if you only want the back set.
+- Back jump frames are skin-aware: penguin wings-up + tucked webbed feet, crab
+  claws overhead, bunny ears flop + cotton tail puff, fox tail streamer with
+  white tip, cat S-curl tail, owl wings spread + folded talons, snow scarf
+  trailing in wind, beach sunhat lifting off, default pack bounce — all with
+  motion streaks under the feet. See `characters/CONTACT_back_anims.png`.
+
+### enemies/jelly_{green,ice,ember}_back.png
+Back-view 5x2 @32 grids matching their fronts (idle breathe, waddle-move with
+tentacle fringe sway, squash-hit). Blob/slime backs already existed; now ALL
+movers have a walk-away set.
+
+### effects/dust_{meadow,snow,beach}_extra.png  (4x2 @48x56, matches hero cells)
+- row0: **sprint double-kick** — alternating stronger puffs + debris chips
+- row1: **slide/skid** — long low cloud dragged behind the heels (use on direction
+  changes / dash ability)
+Palettes matched to each ground (tan dirt+leaf flecks / powder-white+ice chips /
+gold sand+water spray). Layer under the sprite's feet like the base dust sheets.
+
+### ground/foam_river.png & ground/foam_sea.png
+4-frame animated water-edge foam strips (4x1 @16x16). Place along the boundary
+where `water_river`/`mega_*` meets grass or sand; play at ~6 fps for lapping surf.
+River foam is pale teal (matches meadow river), sea foam is deeper blue-white
+(matches beach). Combine with `waves.png` for open-water animation.

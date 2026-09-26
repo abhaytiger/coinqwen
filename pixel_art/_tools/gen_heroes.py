@@ -153,6 +153,70 @@ def sprite(args, skin):
     return img
 
 
+# ---------------- BACK view (walk away from camera; no face visible) ------
+def draw_back(C, leg_f=0, leg_b=0, arm_f=0, arm_b=0, bob=0, collect=False):
+    img = N()
+    y0 = bob
+    cx = 24
+
+    hip_y = 36 + y0
+    # back legs (spread wider than side view), soles flash mid-stride
+    limb(img, [(cx - 4, hip_y), (cx - 5 + leg_b, hip_y + 8)], 4, C["suit_d"])
+    bx = cx - 8 + leg_b
+    rect(img, bx, hip_y + 9, bx + 6, hip_y + 11, C["boots"])
+    rect(img, bx, hip_y + 12, bx + 7, hip_y + 13, darker(C["boots"], 45))
+    if leg_b < 0:                                             # heel lift -> sole
+        rect(img, bx + 1, hip_y + 10, bx + 5, hip_y + 12, lighter(C["boots"], 40))
+    limb(img, [(cx + 4, hip_y), (cx + 5 + leg_f, hip_y + 8)], 4, C["suit"])
+    fx = cx + 2 + leg_f
+    rect(img, fx, hip_y + 9, fx + 6, hip_y + 11, C["boots"])
+    rect(img, fx, hip_y + 12, fx + 7, hip_y + 13, darker(C["boots"], 45))
+    if leg_f > 0:
+        rect(img, fx + 1, hip_y + 10, fx + 5, hip_y + 12, lighter(C["boots"], 40))
+
+    # backpack covers most of the torso from behind
+    pk_x = cx - 8
+    rrect(img, pk_x, 22 + y0, pk_x + 16, 37 + y0, C["pack"], radius=3)
+    rect(img, pk_x, 27 + y0, pk_x + 16, 28 + y0, darker(C["pack"], 50))      # flap seam
+    bottom_shade(img, pk_x, 22 + y0, pk_x + 16, 37 + y0, None, 42)
+    top_light(img, pk_x + 1, 22 + y0, pk_x + 15, 24 + y0, None, 28)
+    # straps over shoulders + buckle
+    rect(img, cx - 6, 20 + y0, cx - 4, 23 + y0, darker(C["pack"], 30))
+    rect(img, cx + 4, 20 + y0, cx + 6, 23 + y0, darker(C["pack"], 30))
+    px(img, cx - 5, 24 + y0, C["trim"]); px(img, cx + 5, 24 + y0, C["trim"])
+    rect(img, pk_x + 6, 31 + y0, pk_x + 10, 34 + y0, darker(C["pack"], 35))  # pocket
+    ellipse(img, pk_x + 7, 32 + y0, pk_x + 9, 33 + y0, (250, 220, 110, 255))  # coin glint
+
+    # arms swinging at sides
+    ax = cx - 9
+    limb(img, [(ax + 1, 25 + y0), (ax + arm_b, 32 + y0)], 4, C["suit_d"])
+    ellipse(img, ax - 2 + arm_b, 31 + y0, ax + 1 + arm_b, 34 + y0, C["glove"])
+    ax2 = cx + 9
+    limb(img, [(ax2 - 1, 25 + y0), (ax2 + arm_f, 32 + y0)], 4, C["suit"])
+    ellipse(img, ax2, 31 + y0, ax2 + 3, 34 + y0, C["glove"])
+    if collect:                                               # right paw up
+        limb(img, [(ax2 - 1, 25 + y0), (ax2 + 3, 18 + y0)], 4, C["suit"])
+        ellipse(img, ax2 + 2, 15 + y0, ax2 + 6, 19 + y0, C["glove"])
+
+    # hood seen from behind + hair peeking below
+    hx, hy = cx - 9, 8 + y0
+    ellipse(img, hx, hy, hx + 18, hy + 19, C["hood"])
+    rect(img, hx, hy + 8, hx + 18, hy + 17, C["hood"])
+    bottom_shade(img, hx, hy, hx + 18, hy + 19, None, 34)
+    top_light(img, hx + 2, hy, hx + 16, hy + 4, None, 22)
+    rect(img, hx + 1, hy + 17, hx + 17, hy + 19, darker(C["hood"], 45))       # hood rim
+    rect(img, hx + 4, hy + 18, hx + 14, hy + 20, C["hair"])                   # hair nape
+    if C.get("scarf"):
+        rrect(img, hx + 1, hy + 18, hx + 17, hy + 21, C["scarf"], radius=1)
+        rect(img, cx - 2, hy + 21, cx + 2, hy + 27, C["scarf"])               # tail
+        rect(img, cx - 1, hy + 21, cx - 1, hy + 27, darker(C["scarf"], 40))
+        for i in range(4):
+            px(img, cx - 2 + i, hy + 27, lighter(C["scarf"], 30))
+    if C.get("shades"):                                        # hat band from behind
+        rect(img, hx + 2, hy + 15, hx + 16, hy + 17, (214, 120, 60, 255))
+    return img
+
+
 ANIMS = {
     "idle": [dict(bob=0), dict(bob=1)],
     "run": [dict(leg_f=-4, leg_b=4, arm_f=3, arm_b=-3, bob=0, lean=2),
@@ -162,17 +226,40 @@ ANIMS = {
     "jump": [dict(leg_f=-3, leg_b=3, arm_f=-4, arm_b=3, bob=-2, lean=1, jump=True)],
     "collect": [dict(collect=True, lean=1)],
 }
+BACK_ANIMS = {
+    "idle": [dict(bob=0), dict(bob=1)],
+    "run": [dict(leg_f=-4, leg_b=4, arm_f=3, arm_b=-3, bob=0),
+            dict(leg_f=0, leg_b=0, arm_f=0, arm_b=0, bob=-2),
+            dict(leg_f=4, leg_b=-4, arm_f=-3, arm_b=3, bob=0),
+            dict(leg_f=0, leg_b=0, arm_f=1, arm_b=-1, bob=-2)],
+    "jump": [dict(leg_f=-3, leg_b=3, arm_f=-4, arm_b=3, bob=-2)],
+    "collect": [dict(collect=True)],
+}
 ORDER = [("idle", 0), ("idle", 1), ("jump", 0), ("collect", 0),
          ("run", 0), ("run", 1), ("run", 2), ("run", 3)]
 
+
+def shadow(fr):
+    sh = Image.new("RGBA", (W * SCALE, H * SCALE), (0, 0, 0, 0))
+    ellipse(sh, 13, 50, 35, 54, (20, 16, 30, 70))
+    from PIL import ImageFilter as IF
+    return Image.alpha_composite(fr, sh.filter(IF.GaussianBlur(SCALE // 2)))
+
+
 for skin in SKINS:
-    sheet = Sheet(4, W, H, rows=2)
-    prev = []
-    for anim, idx in ORDER:
+    c = SKINS[skin]
+    sheet = Sheet(4, W, H, rows=4)
+    prev_side, prev_back = [], []
+    for anim, idx in ORDER:                                    # row0-1: side view
         fr = sprite(ANIMS[anim][idx], skin)
         sheet.add(fr)
-        prev.append(fr)
-    sheet.save(os.path.join(OUT, f"hero_{skin}.png"))
-    save_scaled(hframes(prev[:4]), os.path.join(PREV, f"hero_{skin}_idle_jump_collect@3x.png"), 3)
-    save_scaled(hframes(prev[4:]), os.path.join(PREV, f"hero_{skin}_run@3x.png"), 3)
-print("heroes ok:", ", ".join(SKINS))
+        prev_side.append(fr)
+    for anim, idx in ORDER:                                    # row2-3: back view
+        fr = finalize(draw_back(c, **BACK_ANIMS[anim][idx]), (34, 24, 48, 255))
+        sheet.add(fr)
+        prev_back.append(fr)
+    sheet.canvas.save(os.path.join(OUT, f"hero_{skin}.png"))
+    save_scaled(hframes(prev_side[:4]), os.path.join(PREV, f"hero_{skin}_idle_jump_collect@3x.png"), 3)
+    save_scaled(hframes(prev_side[4:]), os.path.join(PREV, f"hero_{skin}_run@3x.png"), 3)
+    save_scaled(hframes(prev_back[4:]), os.path.join(PREV, f"hero_{skin}_back_run@3x.png"), 3)
+    print("heroes ok:", skin)
