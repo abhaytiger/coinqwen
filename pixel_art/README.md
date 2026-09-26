@@ -60,3 +60,54 @@ python _tools/make_manifest.py   # rebuild MANIFEST.txt
 Palettes/sizes live in dicts at the top of each script (`SKINS`, `SLIMES`, `WORLD`) —
 edit them and re-run to get recolored variants (e.g. new unlockable skins are one dict entry away).
 `MANIFEST.txt` lists every file with exact pixel dimensions.
+
+---
+
+# UPDATE 2026-09-26 — Ground, blob enemy, animal skins, stage props
+
+## New: `ground/` — dedicated ground tilesets (16x16 tiles)
+`grass.png`, `snow.png`, `sand.png` — each a **8x2 sheet of 16x16 tiles**.
+Row 0 = canonical set, row 1 = seeded variants for surface/fill (repeat the whole
+row-1 pattern for variation). Tile order in each row of 8:
+`0 surface | 1 fill | 2 inner-corner TL-cap | 3 rounded outer corner TR |
+4 side-edge L | 5 side-edge R | 6 inner-corner BL-cap | 7 rounded outer corner BR`.
+For Godot: TileMapLayer → TileSet → Terrain Set (matching tiles), or just paint
+tile 0 on top rows + tile 1 below. Also `grass_tuft.png` (16x12) and
+`flower_patch.png` (16x16) scatter decorations.
+
+## New: `enemies/blob_green.png` — the cute jumping green blob
+Same layout as the slimes (5x2 grid @32x32): idle-squish(4) | waddle-move(4) |
+jump crouch + stretched air pose (2). Googly eyes, blush, head sprout.
+It's rounder/taller than slime_green and has a dedicated jump cycle — perfect for
+an enemy that hops toward the player.
+
+## New character skins (`characters/`) — all 4x2 sheets, same frame layout as player_default
+- `player_penguin.png` — tuxedo body, orange beak/feet, wing flap on jumps
+- `player_crab.png` — stalk eyes, claws raise on collect/jump, scuttling run
+- `player_bunny.png` — floppy ears that tilt while running, cotton tail
+- `player_fox.png` — bushy white-tip tail that curls up mid-jump
+- `player_cat.png` — wagging curled tail, stripes, whiskers
+- `player_owl.png` — big disc eyes, flapping wings, feather scallops
+Matching 16x16 unlock icons in `ui/icon_skin_<name>.png`.
+
+## New stage-dressing props (placed along each level)
+**Meadow** (`worlds/classic_meadow/`): `hut.png` (48x40 timber house, glowing windows,
+chimney smoke), `mushroom_house.png` (spotted toadstool cottage), `fence.png` (48x20,
+tiles horizontally), `well.png`, `coin_cart.png` (spilling coins!), `hay_bale.png`,
+`lantern.png`, `mailbox.png`, `butterfly.png` (48x24 = 2 colors x 3 wing-flap frames,
+16x12 each — animate at 8 fps and move it on a sine path).
+
+**Snow Town** (`worlds/snow_town/`): `igloo.png` + `igloo_lit.png` (warm glow variant —
+swap textures for night/day), `snow_cabin.png` (log cabin, wreath door, smoking chimney,
+snow drift), `snow_pine.png` (star-topped), `sled.png`, `snow_globe.png`, `candle.png`,
+`frozen_bush.png`, `stocking_sign.png`, plus NPC penguins: `penguin_idle.png`,
+`penguin_wave.png`, `penguin_scarf.png` (each 48x28 = 2 frames of 24x28; wave makes a
+great "checkpoint greeter").
+
+**Beach** (`worlds/beach/`): `lifeguard_tower.png` (striped awning + life ring),
+`sandcastle.png` (flagged, with towers), `hammock_palm.png` (tall twin palms with a
+pink hammock), `surfboard.png`, `tiki_torch.png`, `flamingo_float.png`, `cooler_box.png`,
+`buoy.png` (bob it in the water zone), `seaweed.png`.
+
+Regenerate everything: `python _tools/gen_ground.py _tools/gen_blob.py` etc. — each
+script is standalone; tweak the palette dicts at the top for instant re-themes.
